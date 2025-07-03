@@ -9,10 +9,10 @@ const updateProfileSlice = createSlice({
     isUpdated: false,
   },
   reducers: {
-    updateProfileRequest(state, action) {
+    updateProfileRequest(state) {
       state.loading = true;
     },
-    updateProfileSuccess(state, action) {
+    updateProfileSuccess(state) {
       state.error = null;
       state.loading = false;
       state.isUpdated = true;
@@ -22,10 +22,10 @@ const updateProfileSlice = createSlice({
       state.loading = false;
       state.isUpdated = false;
     },
-    updatePasswordRequest(state, action) {
+    updatePasswordRequest(state) {
       state.loading = true;
     },
-    updatePasswordSuccess(state, action) {
+    updatePasswordSuccess(state) {
       state.error = null;
       state.loading = false;
       state.isUpdated = true;
@@ -35,7 +35,7 @@ const updateProfileSlice = createSlice({
       state.loading = false;
       state.isUpdated = false;
     },
-    profileResetAfterUpdate(state, action) {
+    profileResetAfterUpdate(state) {
       state.error = null;
       state.isUpdated = false;
       state.loading = false;
@@ -46,7 +46,7 @@ const updateProfileSlice = createSlice({
 export const updateProfile = (data) => async (dispatch) => {
   dispatch(updateProfileSlice.actions.updateProfileRequest());
   try {
-    const response = await axios.put(
+    await axios.put(
       "https://job-portal-x0lu.onrender.com/api/v1/user/update/profile",
       data,
       {
@@ -58,15 +58,16 @@ export const updateProfile = (data) => async (dispatch) => {
   } catch (error) {
     dispatch(
       updateProfileSlice.actions.updateProfileFailed(
-        error.response.data.message || "Failed to update profile."
+        error.response?.data?.message || "Failed to update profile."
       )
     );
   }
 };
+
 export const updatePassword = (data) => async (dispatch) => {
   dispatch(updateProfileSlice.actions.updatePasswordRequest());
   try {
-    const response = await axios.put(
+    await axios.put(
       "https://job-portal-x0lu.onrender.com/api/v1/user/update/password",
       data,
       {
@@ -78,7 +79,7 @@ export const updatePassword = (data) => async (dispatch) => {
   } catch (error) {
     dispatch(
       updateProfileSlice.actions.updatePasswordFailed(
-        error.response.data.message || "Failed to update password."
+        error.response?.data?.message || "Failed to update password."
       )
     );
   }

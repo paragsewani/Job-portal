@@ -11,7 +11,7 @@ const userSlice = createSlice({
     message: null,
   },
   reducers: {
-    registerRequest(state, action) {
+    registerRequest(state) {
       state.loading = true;
       state.isAuthenticated = false;
       state.user = {};
@@ -32,7 +32,7 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-    loginRequest(state, action) {
+    loginRequest(state) {
       state.loading = true;
       state.isAuthenticated = false;
       state.user = {};
@@ -53,7 +53,7 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-    fetchUserRequest(state, action) {
+    fetchUserRequest(state) {
       state.loading = true;
       state.isAuthenticated = false;
       state.user = {};
@@ -71,19 +71,18 @@ const userSlice = createSlice({
       state.user = {};
       state.error = action.payload;
     },
-    logoutSuccess(state, action) {
+    logoutSuccess(state) {
       state.isAuthenticated = false;
       state.user = {};
       state.error = null;
     },
     logoutFailed(state, action) {
-      state.isAuthenticated = state.isAuthenticated;
-      state.user = state.user;
+      state.isAuthenticated = false;
+      state.user = {};
       state.error = action.payload;
     },
-    clearAllErrors(state, action) {
+    clearAllErrors(state) {
       state.error = null;
-      state.user = state.user;
     },
   },
 });
@@ -102,7 +101,9 @@ export const register = (data) => async (dispatch) => {
     dispatch(userSlice.actions.registerSuccess(response.data));
     dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(userSlice.actions.registerFailed(error.response.data.message));
+    dispatch(
+      userSlice.actions.registerFailed(error.response?.data?.message || "Registration failed")
+    );
   }
 };
 
@@ -120,7 +121,9 @@ export const login = (data) => async (dispatch) => {
     dispatch(userSlice.actions.loginSuccess(response.data));
     dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(userSlice.actions.loginFailed(error.response.data.message));
+    dispatch(
+      userSlice.actions.loginFailed(error.response?.data?.message || "Login failed")
+    );
   }
 };
 
@@ -136,12 +139,15 @@ export const getUser = () => async (dispatch) => {
     dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
     dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(userSlice.actions.fetchUserFailed(error.response.data.message));
+    dispatch(
+      userSlice.actions.fetchUserFailed(error.response?.data?.message || "Unable to fetch user")
+    );
   }
 };
+
 export const logout = () => async (dispatch) => {
   try {
-    const response = await axios.get(
+    await axios.get(
       "https://job-portal-x0lu.onrender.com/api/v1/user/logout",
       {
         withCredentials: true,
@@ -150,7 +156,9 @@ export const logout = () => async (dispatch) => {
     dispatch(userSlice.actions.logoutSuccess());
     dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(userSlice.actions.logoutFailed(error.response.data.message));
+    dispatch(
+      userSlice.actions.logoutFailed(error.response?.data?.message || "Logout failed")
+    );
   }
 };
 

@@ -10,7 +10,7 @@ const applicationSlice = createSlice({
     message: null,
   },
   reducers: {
-    requestForAllApplications(state, action) {
+    requestForAllApplications(state) {
       state.loading = true;
       state.error = null;
     },
@@ -23,7 +23,7 @@ const applicationSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    requestForMyApplications(state, action) {
+    requestForMyApplications(state) {
       state.loading = true;
       state.error = null;
     },
@@ -36,7 +36,7 @@ const applicationSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    requestForPostApplication(state, action) {
+    requestForPostApplication(state) {
       state.loading = true;
       state.error = null;
       state.message = null;
@@ -51,7 +51,7 @@ const applicationSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-    requestForDeleteApplication(state, action) {
+    requestForDeleteApplication(state) {
       state.loading = true;
       state.error = null;
       state.message = null;
@@ -66,14 +66,11 @@ const applicationSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-
-    clearAllErrors(state, action) {
+    clearAllErrors(state) {
       state.error = null;
-      state.applications = state.applications;
     },
-    resetApplicationSlice(state, action) {
+    resetApplicationSlice(state) {
       state.error = null;
-      state.applications = state.applications;
       state.message = null;
       state.loading = false;
     },
@@ -85,9 +82,7 @@ export const fetchEmployerApplications = () => async (dispatch) => {
   try {
     const response = await axios.get(
       `https://job-portal-x0lu.onrender.com/api/v1/application/employer/getall`,
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
     dispatch(
       applicationSlice.actions.successForAllApplications(
@@ -98,7 +93,7 @@ export const fetchEmployerApplications = () => async (dispatch) => {
   } catch (error) {
     dispatch(
       applicationSlice.actions.failureForAllApplications(
-        error.response.data.message
+        error.response?.data?.message || "Failed to fetch applications"
       )
     );
   }
@@ -109,9 +104,7 @@ export const fetchJobSeekerApplications = () => async (dispatch) => {
   try {
     const response = await axios.get(
       `https://job-portal-x0lu.onrender.com/api/v1/application/jobseeker/getall`,
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
     dispatch(
       applicationSlice.actions.successForMyApplications(
@@ -122,7 +115,7 @@ export const fetchJobSeekerApplications = () => async (dispatch) => {
   } catch (error) {
     dispatch(
       applicationSlice.actions.failureForMyApplications(
-        error.response.data.message
+        error.response?.data?.message || "Failed to fetch applications"
       )
     );
   }
@@ -146,7 +139,7 @@ export const postApplication = (data, jobId) => async (dispatch) => {
   } catch (error) {
     dispatch(
       applicationSlice.actions.failureForPostApplication(
-        error.response.data.message
+        error.response?.data?.message || "Failed to apply"
       )
     );
   }
@@ -160,15 +153,13 @@ export const deleteApplication = (id) => async (dispatch) => {
       { withCredentials: true }
     );
     dispatch(
-      applicationSlice.actions.successForDeleteApplication(
-        response.data.message
-      )
+      applicationSlice.actions.successForDeleteApplication(response.data.message)
     );
     dispatch(clearAllApplicationErrors());
   } catch (error) {
     dispatch(
       applicationSlice.actions.failureForDeleteApplication(
-        error.response.data.message
+        error.response?.data?.message || "Failed to delete"
       )
     );
   }

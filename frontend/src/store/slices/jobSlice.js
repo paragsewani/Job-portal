@@ -12,7 +12,7 @@ const jobSlice = createSlice({
     myJobs: [],
   },
   reducers: {
-    requestForAllJobs(state, action) {
+    requestForAllJobs(state) {
       state.loading = true;
       state.error = null;
     },
@@ -25,7 +25,7 @@ const jobSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    requestForSingleJob(state, action) {
+    requestForSingleJob(state) {
       state.message = null;
       state.error = null;
       state.loading = true;
@@ -36,11 +36,10 @@ const jobSlice = createSlice({
       state.singleJob = action.payload;
     },
     failureForSingleJob(state, action) {
-      state.singleJob = state.singleJob;
-      state.error = action.payload;
       state.loading = false;
+      state.error = action.payload;
     },
-    requestForPostJob(state, action) {
+    requestForPostJob(state) {
       state.message = null;
       state.error = null;
       state.loading = true;
@@ -55,8 +54,7 @@ const jobSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
-
-    requestForDeleteJob(state, action) {
+    requestForDeleteJob(state) {
       state.loading = true;
       state.error = null;
       state.message = null;
@@ -71,8 +69,7 @@ const jobSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-
-    requestForMyJobs(state, action) {
+    requestForMyJobs(state) {
       state.loading = true;
       state.myJobs = [];
       state.error = null;
@@ -84,74 +81,39 @@ const jobSlice = createSlice({
     },
     failureForMyJobs(state, action) {
       state.loading = false;
-      state.myJobs = state.myJobs;
       state.error = action.payload;
     },
-
-    clearAllErrors(state, action) {
+    clearAllErrors(state) {
       state.error = null;
-      state.jobs = state.jobs;
     },
-    resetJobSlice(state, action) {
+    resetJobSlice(state) {
       state.error = null;
-      state.jobs = state.jobs;
       state.loading = false;
       state.message = null;
-      state.myJobs = state.myJobs;
       state.singleJob = {};
     },
   },
 });
 
-export const fetchJobs =
-  (city, niche, searchKeyword = "") =>
-  async (dispatch) => {
-    try {
-      dispatch(jobSlice.actions.requestForAllJobs());
-      let link = "https://job-portal-x0lu.onrender.com/api/v1/job/getall?";
-      let queryParams = [];
-      if (searchKeyword) {
-        queryParams.push(`searchKeyword=${searchKeyword}`);
-      }
-      if (city && city !== "All") {
-        queryParams.push(`city=${city}`);
-      }
+export const fetchJobs = (city, niche, searchKeyword = "") => async (dispatch) => {
+  try {
+    dispatch(jobSlice.actions.requestForAllJobs());
 
-      /***************************************************/
-      /* BUG No.3 */
-      if (city && city === "All") {
-        queryParams = [];
-        if (searchKeyword) {
-          queryParams.push(`searchKeyword=${searchKeyword}`);
-        }
-      }
-      /***************************************************/
+    let queryParams = [];
+    if (searchKeyword) queryParams.push(`searchKeyword=${searchKeyword}`);
+    if (city && city !== "All") queryParams.push(`city=${city}`);
+    if (niche && niche !== "All") queryParams.push(`niche=${niche}`);
 
-      if (niche) {
-        queryParams.push(`niche=${niche}`);
-      }
+    const queryString = queryParams.join("&");
+    const url = `https://job-portal-x0lu.onrender.com/api/v1/job/getall?${queryString}`;
 
-      /***************************************************/
-      /* BUG No.4 */
-      if (niche && niche === "All") {
-        queryParams = [];
-        if (searchKeyword) {
-          queryParams.push(`searchKeyword=${searchKeyword}`);
-        }
-        if (city && city !== "All") {
-          queryParams.push(`city=${city}`);
-        }
-      }
-      /***************************************************/
-
-      link += queryParams.join("&");
-      const response = await axios.get(link, { withCredentials: true });
-      dispatch(jobSlice.actions.successForAllJobs(response.data.jobs));
-      dispatch(jobSlice.actions.clearAllErrors());
-    } catch (error) {
-      dispatch(jobSlice.actions.failureForAllJobs(error.response.data.message));
-    }
-  };
+    const response = await axios.get(url, { withCredentials: true });
+    dispatch(jobSlice.actions.successForAllJobs(response.data.jobs));
+    dispatch(jobSlice.actions.clearAllErrors());
+  } catch (error) {
+    dispatch(jobSlice.actions.failureForAllJobs(error.response?.data?.message || "Failed to fetch jobs."));
+  }
+};
 
 export const fetchSingleJob = (jobId) => async (dispatch) => {
   dispatch(jobSlice.actions.requestForSingleJob());
@@ -163,7 +125,7 @@ export const fetchSingleJob = (jobId) => async (dispatch) => {
     dispatch(jobSlice.actions.successForSingleJob(response.data.job));
     dispatch(jobSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(jobSlice.actions.failureForSingleJob(error.response.data.message));
+    dispatch(jobSlice.actions.failureForSingleJob(error.response?.data?.message || "Failed to fetch job."));
   }
 };
 
@@ -173,12 +135,15 @@ export const postJob = (data) => async (dispatch) => {
     const response = await axios.post(
       `https://job-portal-x0lu.onrender.com/api/v1/job/post`,
       data,
-      { withCredentials: true, headers: { "Content-Type": "application/json" } }
+      {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      }
     );
     dispatch(jobSlice.actions.successForPostJob(response.data.message));
     dispatch(jobSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(jobSlice.actions.failureForPostJob(error.response.data.message));
+    dispatch(jobSlice.actions.failureForPostJob(error.response?.data?.message || "Failed to post job."));
   }
 };
 
@@ -192,7 +157,7 @@ export const getMyJobs = () => async (dispatch) => {
     dispatch(jobSlice.actions.successForMyJobs(response.data.myJobs));
     dispatch(jobSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(jobSlice.actions.failureForMyJobs(error.response.data.message));
+    dispatch(jobSlice.actions.failureForMyJobs(error.response?.data?.message || "Failed to fetch my jobs."));
   }
 };
 
@@ -206,7 +171,7 @@ export const deleteJob = (id) => async (dispatch) => {
     dispatch(jobSlice.actions.successForDeleteJob(response.data.message));
     dispatch(clearAllJobErrors());
   } catch (error) {
-    dispatch(jobSlice.actions.failureForDeleteJob(error.response.data.message));
+    dispatch(jobSlice.actions.failureForDeleteJob(error.response?.data?.message || "Failed to delete job."));
   }
 };
 
