@@ -26,28 +26,26 @@ A full-stack Job Portal that enables recruiters to post job listings and job see
 
 ## 🗂️ Project Structure
 
+```
 Job-portal/
 ├── backend/
-│ ├── automation/  Cron jobs (e.g., newsletter) for sending email to the target user who is interested in that particular job opening niche
-│ ├── config/  Environment config
-│ ├── controllers/ # Route logic (user, job, application)
-│ ├── database/  MongoDB connection logic
-│ ├── middlewares/ It is for  error handling, authentication and also for authorization 
-│ ├── models/  These contains how user,job and application is structured
-│ ├── routes/  API endpoints divided into different routes for easy mapping with controllers
-│ ├── utils/  Helper functions (e.g., sendToken, sendEmail)
-│ └── server.js ( Entry point for backend)
+│   ├── automation/         # Cron jobs (e.g., newsletter) for sending email to users interested in specific job niches
+│   ├── config/             # Environment configuration
+│   ├── controllers/        # Route logic for user, job, and application
+│   ├── database/           # MongoDB connection logic
+│   ├── middlewares/        # Error handling, authentication, and authorization
+│   ├── models/             # Structure definitions for User, Job, and Application
+│   ├── routes/             # API endpoints organized by feature for easy controller mapping
+│   ├── utils/              # Helper functions like sendToken and sendEmail
+│   └── server.js           # Entry point for the backend
 │
-
-
-
-
 ├── frontend/
-│ ├── public
-│ └── src
-│ ├── assets (for images,icons)
-│ ├── components (This are components like navbar ,footer,jobcard so it can be used anywhere)
-│ ├── pages/ # Page components (Login, Register, Dashboard)
-│ ├── store/  Redux Toolkit slices for maintaing states and easy handling
-│ ├── App.js  Main routing & layout
-│ └── index.js ( React entry point)
+│   ├── public/             # Public assets
+│   └── src/
+│       ├── assets/         # Images, icons, etc.
+│       ├── components/     # Reusable components like Navbar, Footer, JobCard
+│       ├── pages/          # Pages such as Login, Register, and Dashboard
+│       ├── store/          # Redux Toolkit slices for managing global state
+│       ├── App.js          # Main app layout and routing
+│       └── index.js        # React entry point
+```
