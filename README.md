@@ -38,6 +38,10 @@ Job-portal/
 │ ├── utils/  Helper functions (e.g., sendToken, sendEmail)
 │ └── server.js ( Entry point for backend)
 │
+
+
+
+
 ├── frontend/
 │ ├── public
 │ └── src
